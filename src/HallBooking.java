@@ -40,7 +40,7 @@ public class HallBooking {
     // init hall
     public static void initializeHall(){
         hallRow = validateInputNumber("> Config total rows in hall : ","only number from 1-9",input);
-        hallColumn = validateInputNumber("> Config total rows in hall : ","only number from 1-9",input);
+        hallColumn = validateInputNumber("> Config total columns in hall : ","only number from 1-9",input);
         morningHall = new String[hallRow][hallColumn];
         afternoonHall = new String[hallRow][hallColumn];
         nightHall = new String[hallRow][hallColumn];
