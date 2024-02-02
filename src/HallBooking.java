@@ -5,8 +5,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HallBooking {
-    public static Integer hallRow;
-    public static Integer hallColumn;
+    public static int hallRow;
+    public static int hallColumn;
     public static String[][] morningHall;
     public static String[][] afternoonHall;
     public static String[][] nightHall;
@@ -17,19 +17,19 @@ public class HallBooking {
     public static void main(String[] args) {
         initializeHall();
         availableHall();
-        showRowAlphabet(hallRow);
 
         char ch;
         do {
             mainMenu();
-            ch = validateInputChar("> Choose option : ","+".repeat(60)+"\n# Option must be alphabet from A-F\n"+"+".repeat(60),"[a-fA-F]+",input);
+            ch = validateInputChar("> Choose option : ","+".repeat(60)+"\n# Option must be alphabet from A-G\n"+"+".repeat(60),"[a-gA-G]+",input);
             switch (ch){
                 case 'a' -> booking();
                 case 'b' -> showAllHall();
                 case 'c' -> showTimeMenu();
                 case 'd' -> availableHall();
                 case 'e' -> displayBookingHistory();
-                case 'f' -> {
+                case 'f' -> searchUserByName();
+                case 'g' -> {
                     System.out.println("Good bye See you again!!");
                     System.exit(0);
                 }
@@ -108,47 +108,53 @@ public class HallBooking {
             String getUserInput = input.replaceAll("-", "");
             int number = Integer.parseInt(getUserInput.replaceAll("[^0-9]", ""));
             char letter = getUserInput.replaceAll("[^a-zA-Z]", "").charAt(0);
-            for (int i = 0; i < hall.length; i++) {
-                for (int j = 0; j < hall[i].length; j++) {
-                    char alphabet = (char) ('A' + i);
-                    if (alphabet == letter && (number -1 ) == j) {
-                        if (hall[i][j].equals("BO")) {
-                            System.out.println("+".repeat(60));
-                            System.out.println("!! ["+alphabet+"-"+(1+j)+"] already booked!");
-                            System.out.println("!! ["+alphabet+"-"+(1+j)+"] cannot be booked because of unavailability!");
-                            System.out.println("+".repeat(60));
-                            isTrue = false;
-                            break;
-                        } else {
-                            if(validateInputUser){
-                                userName = validateInputString("> Please enter userName : ", "!! Name can not be special character!","[a-zA-Z\\s]+", scanner);
-                                isSure = validateInputChar("> Are you sure to book? (Y/N) : ", "!! please input Y or N ","[yYNn]+", scanner);
-                                validateInputUser = false;
-                            }
-                            if (isSure == 'y') {
-                                hall[i][j] = "BO";
-                                // Update the booking history array
-                                String history = addToHistory(seat, userName , choice);
-                                bookingHistory[historyIndex] = history;
-                            }else {
+            int convertFromCharToInt = Character.getNumericValue(letter);
+            char convertFromIntToChar = (char) ((char) hallRow +65);
+            int rowIntWord = Character.getNumericValue(convertFromIntToChar);
+            if(convertFromCharToInt < rowIntWord && number <= hallColumn){
+                for (int i = 0; i < hall.length; i++) {
+                    for (int j = 0; j < hall[i].length; j++) {
+                        char alphabet = (char) ('A' + i);
+                        if (alphabet == letter && (number - 1 ) == j) {
+                            if (hall[i][j].equals("BO")) {
                                 System.out.println("+".repeat(60));
-                                System.out.println("> Cancel Booking...........");
-                                System.out.println("> Done cancel");
+                                System.out.println("!! ["+alphabet+"-"+(1+j)+"] already booked!");
+                                System.out.println("!! ["+alphabet+"-"+(1+j)+"] cannot be booked because of unavailability!");
                                 System.out.println("+".repeat(60));
                                 isTrue = false;
+                            } else {
+                                if(validateInputUser){
+                                    userName = validateInputString("> Please enter userName : ", "!! Name can not be special character!","[a-zA-Z\\s]+", scanner);
+                                    isSure = validateInputChar("> Are you sure to book? (Y/N) : ", "!! please input Y or N ","[yYNn]+", scanner);
+                                    validateInputUser = false;
+                                }
+                                if (isSure == 'y') {
+                                    hall[i][j] = "BO";
+                                    // Update the booking history array
+                                    String history = addToHistory(seat, userName , choice);
+                                    bookingHistory[historyIndex] = history;
+                                }else {
+                                    System.out.println("+".repeat(60));
+                                    System.out.println("> Cancel Booking...........");
+                                    System.out.println("> Done cancel");
+                                    System.out.println("+".repeat(60));
+                                    isTrue = false;
+                                }
                             }
                         }
-                    }else {
-                        String[] rowInAlphabet = showRowAlphabet(hallRow);
-                        String[] column = showColumn(hallColumn);
-                        System.out.println("+".repeat(60));
-                        System.out.println("! seat not found!!");
-                        System.out.println("! seat available from "+ Arrays.toString(rowInAlphabet)+" and "+ Arrays.toString(column));
-                        System.out.println("+".repeat(60));
-                        return;
                     }
                 }
+            }else {
+                String[] rowInAlphabet = showRowAlphabet(hallRow);
+                String[] column = showColumn(hallColumn);
+                System.out.println("+".repeat(60));
+                System.out.println("! seat not found!!");
+                System.out.println("! seat available from "+ Arrays.toString(rowInAlphabet)+" and "+ Arrays.toString(column));
+                System.out.println("+".repeat(60));
+                isTrue = false;
+                break;
             }
+
         }
         if(isTrue){
             System.out.println("+".repeat(60));
@@ -156,6 +162,23 @@ public class HallBooking {
             System.out.println("+".repeat(60));
             historyIndex++;
         }
+    }
+
+    // show total column
+    public static String[] showColumn(int column){
+        String[] array = new String[column];
+        for (int i =0; i<column; i++){
+            array[i] = String.valueOf(i+1);
+        }
+        return array;
+    }
+    // show total row in alphabet
+    public static String[] showRowAlphabet(int row){
+        String[] array = new String[row];
+        for (int i = 0; i<row; i++){
+            array[i] =  String.valueOf((char) ('A' + i));
+        }
+        return array;
     }
     // add to history
     public static String addToHistory(String seat, String userName , Character choice){
@@ -170,7 +193,7 @@ public class HallBooking {
                         "\n#BookingID : " +uniqueID+
                         "\n#HALL         #USER.NAME               #CREATED AT" +
                         "\nHALL %-8s %-23s  %-20s  "
-                ,hall,userName,formattedDateTime);
+                ,hall,userName.toUpperCase(),formattedDateTime);
     }
     // single and multiple select method
     public static String[] singleAndMultipleSelect(){
@@ -192,22 +215,7 @@ public class HallBooking {
             }
         }
     }
-    // show total row in alphabet
-    public static String[] showRowAlphabet(int row){
-        String[] array = new String[row];
-        for (int i = 0; i<row; i++){
-            array[i] =  String.valueOf((char) ('A' + i));
-        }
-        return array;
-    }
-    // show total column
-    public static String[] showColumn(int column){
-        String[] array = new String[column];
-        for (int i =0; i<column; i++){
-            array[i] = String.valueOf(i+1);
-        }
-        return array;
-    }
+
     // show booking history
     public static void displayBookingHistory() {
         boolean isFound = false;
@@ -262,6 +270,37 @@ public class HallBooking {
         }
     }
 
+    // search user when they already booked
+    public static void searchUserByName(){
+        System.out.println("-".repeat(60));
+        System.out.print("""
+                    # INSTRUCTION
+                    # EXAMPLE USERNAME : YITH SOPHEAKTRA
+                    # YOU CAN INPUT ONLY Y OR YI OR S OR SO
+                    # IT WILL LIST ALL THE RESULT BASE ON YOUR INPUT
+                    """);
+        System.out.println("-".repeat(60));
+        String userInput = validateInputString("> Please enter userName : ", "!! Name can not be special character!","[a-zA-Z\\s]+", input).toUpperCase();
+        boolean isFound = false;
+        for (String history : bookingHistory) {
+            if (history != null) {
+                String regex = "HALL\\s+[a-zA-Z]+\\s+.*" + Pattern.quote(userInput);
+                Pattern pattern = Pattern.compile(regex);
+                Matcher matcher = pattern.matcher(history);
+                if (matcher.find()) {
+                    System.out.println("-".repeat(60));
+                    System.out.println(history);
+                    System.out.println("-".repeat(60));
+                    System.out.println("+".repeat(60));
+                    isFound = true;
+                }
+            }
+
+        }
+        if(!isFound){
+            System.out.println("! No data found!");
+        }
+    }
 
     // validate String
     public static String validateInputString(String message, String error, String patternString, Scanner input ){
@@ -286,7 +325,8 @@ public class HallBooking {
                     <C> Showtime
                     <D> Reboot Showtime
                     <E> History
-                    <F> Exit
+                    <F> SearchByUsername
+                    <G> Exit
                     """);
     }
 
